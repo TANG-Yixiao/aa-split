@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AA分摊">
+<title>AA 聚餐分摊</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f5f7;--card:#fff;--border:rgba(0,0,0,.06);
+  --text:#1d1d1f;--text2:#86868b;--text3:#aeaeb2;
+  --accent:#ff9500;--accent-light:rgba(255,149,0,.1);
+  --danger:#ff3b30;--danger-light:rgba(255,59,48,.08);
+  --radius:16px;--radius-sm:12px;--radius-xs:10px;
+  --shadow:0 2px 12px rgba(0,0,0,.06);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#000;--card:#1c1c1e;--border:rgba(255,255,255,.08);
+    --text:#f5f5f7;--text2:#98989d;--text3:#636366;
+    --shadow:0 2px 12px rgba(0,0,0,.3);
+  }
+}
+html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
+  font-size:16px;color:var(--text);background:var(--bg);
+  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body{min-height:100dvh;padding-bottom:calc(16px + var(--safe-bottom));overflow-x:hidden}
+.container{max-width:480px;margin:0 auto;padding:0 16px}
+.section{margin-bottom:24px}
+.section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-left:4px}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:16px;margin-bottom:12px}
+.row{display:flex;align-items:center;gap:12px}
+.grow{flex:1}
+.text-secondary{color:var(--text2);font-size:14px}
+.text-caption{color:var(--text3);font-size:12px}
+.bold{font-weight:600}
+.mono{font-variant-numeric:tabular-nums}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;
+  cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;
+  padding:12px 20px;width:100%;
+}
+.btn:active{transform:scale(.97);opacity:.85}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-glass{background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow)}
+.btn-danger{background:var(--danger-light);color:var(--danger)}
+.btn-sm{padding:10px 14px;font-size:14px;border-radius:var(--radius-xs)}
+.btn:disabled{opacity:.35;pointer-events:none}
+
+.chip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chip{
+  display:flex;align-items:center;justify-content:center;
+  padding:12px 4px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;
+  background:var(--card);border:1.5px solid var(--border);box-shadow:var(--shadow);
+  cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;
+}
+.chip:active{transform:scale(.96)}
+.chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
+
+.quick-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.quick-btn{
+  padding:11px 4px;border-radius:var(--radius-xs);font-size:15px;font-weight:700;
+  background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);
+  text-align:center;cursor:pointer;transition:all .12s ease;-webkit-user-select:none;user-select:none;
+}
+.quick-btn:active{transform:scale(.94);background:var(--accent-light)}
+
+.input{
+  width:100%;padding:14px;border-radius:var(--radius-sm);
+  border:1px solid var(--border);background:var(--bg);font-size:16px;
+  color:var(--text);outline:none;transition:border-color .15s;
+}
+.input:focus{border-color:var(--accent)}
+.input::placeholder{color:var(--text3)}
+
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);border:1px solid var(--border)}
+.summary-cell{padding:16px;border-bottom:1px solid var(--border)}
+.summary-cell:nth-child(odd){border-right:1px solid var(--border)}
+.summary-cell .label{font-size:12px;color:var(--text2);margin-bottom:6px}
+.summary-cell .value{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
+
+.record-item{display:flex;align-items:flex-start;gap:10px;padding:14px}
+.record-item:not(:last-child){border-bottom:1px solid var(--border)}
+.record-tag{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--bg);color:var(--text2);white-space:nowrap;flex-shrink:0;margin-top:2px}
+.record-info{flex:1;min-width:0}
+.record-title{font-size:14px;font-weight:500}
+.record-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.record-amount{font-size:14px;font-weight:700;white-space:nowrap;margin-top:2px;font-variant-numeric:tabular-nums}
+
+.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.action-tile{
+  display:flex;align-items:center;justify-content:center;
+  padding:18px 8px;border-radius:var(--radius);
+  background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);
+  cursor:pointer;transition:all .12s;font-size:13px;font-weight:600;text-align:center;
+  -webkit-user-select:none;user-select:none;
+}
+.action-tile:active{transform:scale(.96);opacity:.85}
+
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.modal-backdrop.show{opacity:1;pointer-events:auto}
+.modal{
+  width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;
+  background:var(--bg);border-radius:20px 20px 0 0;
+  padding:20px 16px calc(20px + var(--safe-bottom));
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.modal-backdrop.show .modal{transform:translateY(0)}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;text-align:center}
+.modal-close{font-size:14px;font-weight:600;color:var(--accent);cursor:pointer;padding:8px}
+
+.participant-row{
+  display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);
+  cursor:pointer;-webkit-user-select:none;user-select:none;
+}
+.participant-row .name{flex:1;font-size:15px}
+.check-circle{
+  width:24px;height:24px;border-radius:50%;border:2px solid var(--border);
+  display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:14px;
+}
+.check-circle.checked{background:var(--text);border-color:var(--text);color:var(--card)}
+
+.select-all-row{
+  display:flex;align-items:center;padding:10px 0 6px;cursor:pointer;
+  -webkit-user-select:none;user-select:none;
+}
+.select-all-row .label{flex:1;font-size:14px;font-weight:600;color:var(--accent)}
+
+.page{display:none}
+.page.active{display:block}
+.page-header{padding:20px 0 8px}
+.page-header h1{font-size:32px;font-weight:800;letter-spacing:-.8px}
+.page-header p{color:var(--text2);font-size:14px;margin-top:6px}
+
+.bottom-action{
+  position:sticky;bottom:0;left:0;right:0;
+  padding:12px 16px calc(12px + var(--safe-bottom));
+  background:linear-gradient(transparent,var(--bg) 20%);
+  pointer-events:none;
+}
+.bottom-action .btn{pointer-events:auto}
+
+/* Confirm dialog */
+.confirm-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.confirm-backdrop.show{opacity:1;pointer-events:auto}
+.confirm-box{
+  width:280px;background:var(--card);border-radius:14px;overflow:hidden;
+  text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);
+  transform:scale(.9);transition:transform .2s cubic-bezier(.32,.72,0,1);
+}
+.confirm-backdrop.show .confirm-box{transform:scale(1)}
+.confirm-msg{padding:20px 16px 14px;font-size:15px;font-weight:500;line-height:1.5}
+.confirm-actions{display:flex;border-top:1px solid var(--border)}
+.confirm-actions button{
+  flex:1;padding:14px;font-size:15px;font-weight:600;border:none;
+  background:transparent;cursor:pointer;color:var(--accent);
+}
+.confirm-actions button:first-child{border-right:1px solid var(--border);color:var(--text2)}
+.confirm-actions button.destructive{color:var(--danger)}
+</style>
+</head>
+<body>
+
+<!-- START PAGE -->
+<div id="startPage" class="page active">
+<div class="container">
+  <div class="page-header">
+    <h1>AA 聚餐分摊</h1>
+    <p>先把这一桌的人定下来，再开始记每一笔。</p>
+  </div>
+  <div class="section">
+    <div class="section-title">这桌有几个人？</div>
+    <div class="chip-grid" id="countGrid"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">成员名字（可选）</div>
+    <div class="card" id="namesCard"></div>
+  </div>
+</div>
+<div class="bottom-action container">
+  <button class="btn btn-primary" onclick="startSession()">开始记账</button>
+</div>
+</div>
+
+<!-- SESSION PAGE -->
+<div id="sessionPage" class="page">
+<div class="container" style="padding-top:16px">
+  <div class="section">
+    <div class="section-title">本桌汇总</div>
+    <div class="summary-grid">
+      <div class="summary-cell"><div class="label">本桌人数</div><div class="value" id="sumCount">-</div></div>
+      <div class="summary-cell"><div class="label">原始总额</div><div class="value" id="sumOriginal">¥0</div></div>
+      <div class="summary-cell"><div class="label">最终实付</div><div class="value" id="sumPayment">未录入</div></div>
+      <div class="summary-cell"><div class="label">当前差额</div><div class="value" id="sumDiff">待计算</div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">成员记账</div>
+    <div id="participantCards"></div>
+  </div>
+  <div class="section">
+    <div class="section-title">快捷操作</div>
+    <div class="action-grid">
+      <div class="action-tile" onclick="openSharedModal()">新增共享菜</div>
+      <div class="action-tile" onclick="openPaymentModal()">录入实付</div>
+      <div class="action-tile" onclick="openResultModal()">结算结果</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">本局记录</div>
+    <div class="card" id="recordList" style="padding:0;overflow:hidden">
+      <div style="padding:16px" class="text-secondary">还没有记录，先点一个价格试试。</div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-title">纠错与重置</div>
+    <div class="row">
+      <button class="btn btn-glass grow btn-sm" id="undoBtn" onclick="undoLast()" disabled>撤销最后一笔</button>
+      <button class="btn btn-danger grow btn-sm" id="clearBtn" onclick="askClear()" disabled>一键清空</button>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn btn-glass btn-sm" onclick="askRestart()">重新设置</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DIY Modal -->
+<div class="modal-backdrop" id="diyModal">
+<div class="modal">
+  <div class="row" style="margin-bottom:16px">
+    <span class="grow modal-title" id="diyTitle">记一笔</span>
+    <span class="modal-close" onclick="closeModal('diyModal')">完成</span>
+  </div>
+  <input class="input" id="diyInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01">
+  <p class="text-caption" style="margin:8px 0 16px 4px">支持小数，显示最多保留两位。</p>
+  <button class="btn btn-primary" onclick="confirmDIY()">加入记录</button>
+</div>
+</div>
+
+<!-- Shared Modal -->
+<div class="modal-backdrop" id="sharedModal">
+<div class="modal">
+  <div class="row" style="margin-bottom:16px">
+    <span class="grow modal-title">新增共享菜</span>
+    <span class="modal-close" onclick="closeModal('sharedModal')">取消</span>
+  </div>
+  <div class="section-title">金额</div>
+  <div class="quick-row" style="margin-bottom:8px" id="sharedQuickRow"></div>
+  <input class="input" id="sharedAmountInput" type="number" inputmode="decimal" placeholder="DIY 金额" step="0.01" style="margin-bottom:16px">
+  <div class="section-title">参与分摊的人</div>
+  <div id="sharedSelectAll"></div>
+  <div id="sharedParticipants" style="margin-bottom:16px"></div>
+  <div id="sharedPreview" class="text-secondary" style="margin-bottom:16px"></div>
+  <button class="btn btn-primary" id="sharedConfirmBtn" onclick="confirmShared()" disabled>加入记录</button>
+</div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-backdrop" id="paymentModal">
+<div class="modal">
+  <div class="row" style="margin-bottom:16px">
+    <span class="grow modal-title">录入实付</span>
+    <span class="modal-close" onclick="closeModal('paymentModal')">完成</span>
+  </div>
+  <div class="section-title">已录入实付</div>
+  <div id="paymentList" class="text-secondary" style="margin-bottom:16px">还没有实付记录</div>
+  <div class="section-title">新增一笔实付</div>
+  <input class="input" id="paymentInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01" style="margin-bottom:12px">
+  <button class="btn btn-glass" onclick="addPayment()">添加</button>
+  <div style="margin-top:16px;padding:14px;background:var(--bg);border-radius:var(--radius-sm)">
+    <div class="row" style="margin-bottom:6px"><span class="text-secondary">原始总额</span><span class="grow"></span><span class="bold mono" id="payOriginal">¥0</span></div>
+    <div class="row" style="margin-bottom:6px"><span class="text-secondary">实付总额</span><span class="grow"></span><span class="bold mono" id="payTotal">未录入</span></div>
+    <div class="row"><span class="text-secondary">当前差额</span><span class="grow"></span><span class="bold mono" id="payDiff">待计算</span></div>
+    <p class="text-caption" style="margin-top:8px">差额按每个人原始消费占比分摊。</p>
+  </div>
+</div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal-backdrop" id="resultModal">
+<div class="modal">
+  <div class="row" style="margin-bottom:16px">
+    <span class="grow modal-title">结算结果</span>
+    <span class="modal-close" onclick="closeModal('resultModal')">返回</span>
+  </div>
+  <div id="resultContent"></div>
+</div>
+</div>
+
+<!-- Confirm Dialog -->
+<div class="confirm-backdrop" id="confirmDialog">
+  <div class="confirm-box">
+    <div class="confirm-msg" id="confirmMsg"></div>
+    <div class="confirm-actions">
+      <button onclick="closeConfirm()">取消</button>
+      <button class="destructive" id="confirmOk">确认</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// State
+let participantCount = 2;
+let names = Array(8).fill('');
+let session = null;
+const QUICK = [8, 10, 15, 20];
+let diyTargetId = null;
+let sharedSelectedAmount = null;
+let sharedSelectedIds = new Set();
+let confirmCallback = null;
+
+const $ = id => document.getElementById(id);
+
+// Format
+function fmt(v, signed) {
+  const n = Math.round(v * 100) / 100;
+  const abs = Math.abs(n);
+  const s = abs % 1 === 0 ? abs.toString() : abs.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+  if (signed) {
+    if (n > 0.001) return '+\u00a5' + s;
+    if (n < -0.001) return '-\u00a5' + s;
+    return '\u00a50';
+  }
+  return '\u00a5' + s;
+}
+function uid() { return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2); }
+
+// Confirm dialog
+function showConfirm(msg, cb) {
+  $('confirmMsg').textContent = msg;
+  confirmCallback = cb;
+  $('confirmDialog').classList.add('show');
+}
+function closeConfirm() { $('confirmDialog').classList.remove('show'); confirmCallback = null; }
+$('confirmOk').onclick = function() {
+  $('confirmDialog').classList.remove('show');
+  if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+};
+
+// Pages
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  $(id).classList.add('active');
+}
+
+// Modal
+function openModal(id) { $(id).classList.add('show'); }
+function closeModal(id) { $(id).classList.remove('show'); }
+document.querySelectorAll('.modal-backdrop').forEach(function(el) {
+  el.addEventListener('click', function(e) { if (e.target === el) el.classList.remove('show'); });
+});
+
+// ===== START PAGE =====
+function renderStart() {
+  var grid = $('countGrid');
+  grid.innerHTML = '';
+  for (var i = 2; i <= 8; i++) {
+    var el = document.createElement('div');
+    el.className = 'chip' + (i === participantCount ? ' selected' : '');
+    el.textContent = i + ' \u4eba';
+    el.setAttribute('data-count', i);
+    el.onclick = function() {
+      participantCount = parseInt(this.getAttribute('data-count'));
+      renderStart();
+    };
+    grid.appendChild(el);
+  }
+  var card = $('namesCard');
+  card.innerHTML = '';
+  for (var i = 0; i < participantCount; i++) {
+    var wrap = document.createElement('div');
+    if (i > 0) wrap.style.marginTop = '12px';
+    var label = document.createElement('div');
+    label.className = 'text-caption';
+    label.style.marginBottom = '6px';
+    label.textContent = '\u6210\u5458 ' + (i + 1);
+    wrap.appendChild(label);
+    var inp = document.createElement('input');
+    inp.className = 'input';
+    inp.placeholder = '\u7559\u7a7a\u5219\u9ed8\u8ba4\u663e\u793a\u4e3a\u6210\u5458 ' + (i + 1);
+    inp.value = names[i];
+    inp.setAttribute('data-idx', i);
+    inp.oninput = function() { names[parseInt(this.getAttribute('data-idx'))] = this.value; };
+    wrap.appendChild(inp);
+    card.appendChild(wrap);
+  }
+}
+
+function startSession() {
+  var participants = [];
+  for (var i = 0; i < participantCount; i++) {
+    var raw = names[i].trim();
+    participants.push({ id: uid(), name: raw || ('\u6210\u5458 ' + (i + 1)) });
+  }
+  session = { participants: participants, records: [] };
+  showPage('sessionPage');
+  renderSession();
+}
+
+// ===== SESSION =====
+function pName(id) {
+  for (var i = 0; i < session.participants.length; i++) {
+    if (session.participants[i].id === id) return session.participants[i].name;
+  }
+  return '\u672a\u77e5';
+}
+
+function originalTotal() {
+  var t = 0;
+  for (var i = 0; i < session.records.length; i++) {
+    if (session.records[i].kind !== 'payment') t += session.records[i].amount;
+  }
+  return t;
+}
+function paymentTotal() {
+  var pays = session.records.filter(function(r) { return r.kind === 'payment'; });
+  return pays.length ? pays.reduce(function(s, r) { return s + r.amount; }, 0) : null;
+}
+function difference() {
+  var pt = paymentTotal();
+  return pt !== null ? pt - originalTotal() : null;
+}
+function originalAmount(pid) {
+  var total = 0;
+  for (var i = 0; i < session.records.length; i++) {
+    var r = session.records[i];
+    if (r.kind === 'personal' && r.participantId === pid) total += r.amount;
+    if (r.kind === 'shared' && r.participantIds.indexOf(pid) >= 0) total += r.amount / r.participantIds.length;
+  }
+  return total;
+}
+function adjustment(pid) {
+  var diff = difference();
+  var ot = originalTotal();
+  if (diff === null || ot <= 0) return 0;
+  var oa = originalAmount(pid);
+  return oa > 0 ? diff * oa / ot : 0;
+}
+function finalAmount(pid) { return originalAmount(pid) + adjustment(pid); }
+
+function renderSession() {
+  if (!session) return;
+  $('sumCount').textContent = session.participants.length + ' \u4eba';
+  $('sumOriginal').textContent = fmt(originalTotal());
+  var pt = paymentTotal();
+  $('sumPayment').textContent = pt !== null ? fmt(pt) : '\u672a\u5f55\u5165';
+  var diff = difference();
+  $('sumDiff').textContent = diff !== null ? fmt(diff, true) : '\u5f85\u8ba1\u7b97';
+
+  var container = $('participantCards');
+  container.innerHTML = '';
+  for (var i = 0; i < session.participants.length; i++) {
+    var p = session.participants[i];
+    var oa = originalAmount(p.id);
+    var adj = adjustment(p.id);
+    var fa = finalAmount(p.id);
+    var card = document.createElement('div');
+    card.className = 'card';
+    var quickBtns = '';
+    for (var q = 0; q < QUICK.length; q++) {
+      quickBtns += '<div class="quick-btn" data-amt="' + QUICK[q] + '" data-pid="' + p.id + '">' + QUICK[q] + '</div>';
+    }
+    quickBtns += '<div class="quick-btn" data-diy="1" data-pid="' + p.id + '" data-pname="' + p.name + '">DIY</div>';
+    card.innerHTML = '<div class="row" style="margin-bottom:12px">' +
+      '<div class="grow"><div style="font-size:17px;font-weight:600">' + p.name + '</div>' +
+      '<div class="text-caption" style="margin-top:4px">\u539f\u59cb ' + fmt(oa) + ' \u00b7 \u6821\u6b63 ' + fmt(adj, true) + '</div></div>' +
+      '<div style="text-align:right"><div class="text-caption">\u5e94\u4ed8</div>' +
+      '<div style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">' + fmt(fa) + '</div></div></div>' +
+      '<div class="quick-row">' + quickBtns + '</div>';
+    container.appendChild(card);
+  }
+  // Bind quick buttons
+  container.querySelectorAll('.quick-btn[data-amt]').forEach(function(btn) {
+    btn.onclick = function() {
+      addPersonal(parseFloat(this.getAttribute('data-amt')), this.getAttribute('data-pid'));
+    };
+  });
+  container.querySelectorAll('.quick-btn[data-diy]').forEach(function(btn) {
+    btn.onclick = function() {
+      openDIY(this.getAttribute('data-pid'), this.getAttribute('data-pname'));
+    };
+  });
+
+  // Records
+  var rl = $('recordList');
+  if (session.records.length === 0) {
+    rl.innerHTML = '<div style="padding:16px" class="text-secondary">\u8fd8\u6ca1\u6709\u8bb0\u5f55\uff0c\u5148\u70b9\u4e00\u4e2a\u4ef7\u683c\u8bd5\u8bd5\u3002</div>';
+  } else {
+    var html = '';
+    for (var i = session.records.length - 1; i >= 0; i--) {
+      var r = session.records[i];
+      var tag, title, sub, amt;
+      if (r.kind === 'personal') {
+        tag = '\u5355\u4eba'; title = pName(r.participantId) + ' \u70b9\u4e86\u4e00\u4efd'; sub = '\u8bb0\u5230\u4e2a\u4eba\u540d\u4e0b'; amt = fmt(r.amount, true);
+      } else if (r.kind === 'shared') {
+        tag = '\u5171\u4eab'; title = r.participantIds.map(pName).join(' / ') + ' \u5e73\u644a';
+        sub = '\u6bcf\u4eba ' + fmt(r.amount / r.participantIds.length); amt = fmt(r.amount, true);
+      } else {
+        tag = '\u5b9e\u4ed8'; title = '\u65b0\u589e\u4e00\u7b14\u5b9e\u4ed8'; sub = '\u7528\u4e8e\u6700\u7ec8\u5b9e\u4ed8\u6821\u6b63'; amt = fmt(r.amount);
+      }
+      html += '<div class="record-item"><span class="record-tag">' + tag + '</span><div class="record-info"><div class="record-title">' + title + '</div><div class="record-sub">' + sub + '</div></div><div class="record-amount">' + amt + '</div></div>';
+    }
+    rl.innerHTML = html;
+  }
+
+  $('undoBtn').disabled = session.records.length === 0;
+  $('clearBtn').disabled = session.records.length === 0;
+}
+
+function addPersonal(amount, pid) {
+  session.records.push({ id: uid(), kind: 'personal', amount: amount, participantId: pid, ts: Date.now() });
+  renderSession();
+}
+
+// DIY
+function openDIY(pid, name) {
+  diyTargetId = pid;
+  $('diyTitle').textContent = '\u7ed9 ' + name + ' \u8bb0\u4e00\u7b14';
+  $('diyInput').value = '';
+  openModal('diyModal');
+  setTimeout(function() { $('diyInput').focus(); }, 350);
+}
+function confirmDIY() {
+  var v = parseFloat($('diyInput').value);
+  if (!v || v <= 0) return;
+  addPersonal(v, diyTargetId);
+  closeModal('diyModal');
+}
+
+// Shared
+function openSharedModal() {
+  sharedSelectedAmount = null;
+  sharedSelectedIds = new Set();
+  $('sharedAmountInput').value = '';
+  var qr = $('sharedQuickRow');
+  var qhtml = '';
+  for (var i = 0; i < QUICK.length; i++) {
+    qhtml += '<div class="quick-btn" data-samt="' + QUICK[i] + '">' + QUICK[i] + '</div>';
+  }
+  qhtml += '<div></div>';
+  qr.innerHTML = qhtml;
+  qr.querySelectorAll('.quick-btn[data-samt]').forEach(function(btn) {
+    btn.onclick = function() {
+      sharedSelectedAmount = parseFloat(this.getAttribute('data-samt'));
+      $('sharedAmountInput').value = '';
+      qr.querySelectorAll('.quick-btn').forEach(function(b) { b.style.borderColor = ''; });
+      this.style.borderColor = 'var(--accent)';
+      updateSharedPreview();
+    };
+  });
+
+  // Select all button
+  $('sharedSelectAll').innerHTML = '<div class="select-all-row" id="selectAllBtn"><span class="label">\u5168\u9009\u6240\u6709\u4eba</span></div>';
+  $('selectAllBtn').onclick = function() {
+    var allSelected = sharedSelectedIds.size === session.participants.length;
+    if (allSelected) {
+      sharedSelectedIds = new Set();
+    } else {
+      sharedSelectedIds = new Set(session.participants.map(function(p) { return p.id; }));
+    }
+    refreshSharedChecks();
+    updateSharedPreview();
+  };
+
+  var sp = $('sharedParticipants');
+  var phtml = '';
+  for (var i = 0; i < session.participants.length; i++) {
+    var p = session.participants[i];
+    phtml += '<div class="participant-row" data-pid="' + p.id + '"><span class="name">' + p.name + '</span><span class="check-circle" id="sharedCheck_' + p.id + '"></span></div>';
+  }
+  sp.innerHTML = phtml;
+  sp.querySelectorAll('.participant-row').forEach(function(row) {
+    row.onclick = function() {
+      var pid = this.getAttribute('data-pid');
+      if (sharedSelectedIds.has(pid)) sharedSelectedIds.delete(pid); else sharedSelectedIds.add(pid);
+      refreshSharedChecks();
+      updateSharedPreview();
+    };
+  });
+  updateSharedPreview();
+  openModal('sharedModal');
+}
+
+function refreshSharedChecks() {
+  for (var i = 0; i < session.participants.length; i++) {
+    var p = session.participants[i];
+    var el = $('sharedCheck_' + p.id);
+    if (el) {
+      var sel = sharedSelectedIds.has(p.id);
+      el.className = 'check-circle' + (sel ? ' checked' : '');
+      el.textContent = sel ? '\u2713' : '';
+    }
+  }
+  // Update select all label
+  var allSelected = sharedSelectedIds.size === session.participants.length;
+  var btn = $('selectAllBtn');
+  if (btn) {
+    btn.querySelector('.label').textContent = allSelected ? '\u53d6\u6d88\u5168\u9009' : '\u5168\u9009\u6240\u6709\u4eba';
+  }
+}
+
+function getSharedAmount() {
+  var custom = parseFloat($('sharedAmountInput').value);
+  return (custom > 0) ? custom : sharedSelectedAmount;
+}
+function updateSharedPreview() {
+  var a = getSharedAmount();
+  var n = sharedSelectedIds.size;
+  var pre = $('sharedPreview');
+  if (a && n >= 2) {
+    pre.textContent = '\u603b\u989d ' + fmt(a) + ' \u00b7 ' + n + ' \u4eba \u00b7 \u6bcf\u4eba ' + fmt(a / n);
+  } else {
+    pre.textContent = n < 2 ? '\u8bf7\u9009\u62e9\u81f3\u5c11 2 \u4eba' : '\u8bf7\u8f93\u5165\u91d1\u989d';
+  }
+  $('sharedConfirmBtn').disabled = !(a > 0 && n >= 2);
+}
+$('sharedAmountInput').addEventListener('input', function() {
+  sharedSelectedAmount = null;
+  $('sharedQuickRow').querySelectorAll('.quick-btn').forEach(function(b) { b.style.borderColor = ''; });
+  updateSharedPreview();
+});
+function confirmShared() {
+  var a = getSharedAmount();
+  if (!a || sharedSelectedIds.size < 2) return;
+  session.records.push({ id: uid(), kind: 'shared', amount: a, participantIds: Array.from(sharedSelectedIds), ts: Date.now() });
+  closeModal('sharedModal');
+  renderSession();
+}
+
+// Payment
+function openPaymentModal() {
+  $('paymentInput').value = '';
+  renderPaymentModal();
+  openModal('paymentModal');
+}
+function renderPaymentModal() {
+  var pays = session.records.filter(function(r) { return r.kind === 'payment'; });
+  if (pays.length) {
+    var h = '';
+    for (var i = 0; i < pays.length; i++) {
+      h += '<div class="row" style="margin-bottom:6px"><span>\u5b9e\u4ed8 ' + (i + 1) + '</span><span class="grow"></span><span class="bold mono">' + fmt(pays[i].amount) + '</span></div>';
+    }
+    $('paymentList').innerHTML = h;
+  } else {
+    $('paymentList').textContent = '\u8fd8\u6ca1\u6709\u5b9e\u4ed8\u8bb0\u5f55';
+  }
+  $('payOriginal').textContent = fmt(originalTotal());
+  var pt = paymentTotal();
+  $('payTotal').textContent = pt !== null ? fmt(pt) : '\u672a\u5f55\u5165';
+  var diff = difference();
+  $('payDiff').textContent = diff !== null ? fmt(diff, true) : '\u5f85\u8ba1\u7b97';
+}
+function addPayment() {
+  var v = parseFloat($('paymentInput').value);
+  if (!v || v <= 0) return;
+  session.records.push({ id: uid(), kind: 'payment', amount: v, ts: Date.now() });
+  $('paymentInput').value = '';
+  renderPaymentModal();
+  renderSession();
+}
+
+// Result
+function openResultModal() {
+  var html = '<div class="section-title">\u6bcf\u4e2a\u4eba\u6700\u7ec8\u5e94\u4ed8</div>';
+  for (var i = 0; i < session.participants.length; i++) {
+    var p = session.participants[i];
+    var oa = originalAmount(p.id);
+    var adj = adjustment(p.id);
+    var fa = finalAmount(p.id);
+    html += '<div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:10px">' + p.name + '</div>' +
+      '<div class="row" style="margin-bottom:4px"><span class="text-secondary">\u539f\u59cb</span><span class="grow"></span><span class="mono">' + fmt(oa) + '</span></div>' +
+      '<div class="row" style="margin-bottom:4px"><span class="text-secondary">\u6821\u6b63</span><span class="grow"></span><span class="mono">' + fmt(adj, true) + '</span></div>' +
+      '<div class="row"><span class="bold">\u6700\u7ec8\u5e94\u4ed8</span><span class="grow"></span><span class="bold mono" style="font-size:17px">' + fmt(fa) + '</span></div></div>';
+  }
+  html += '<div class="section-title" style="margin-top:20px">\u6574\u684c\u6c47\u603b</div><div class="card">';
+  html += '<div class="row" style="margin-bottom:6px"><span class="text-secondary">\u539f\u59cb\u603b\u989d</span><span class="grow"></span><span class="mono">' + fmt(originalTotal()) + '</span></div>';
+  var pt = paymentTotal();
+  html += '<div class="row" style="margin-bottom:6px"><span class="text-secondary">\u6700\u7ec8\u5b9e\u4ed8</span><span class="grow"></span><span class="mono">' + (pt !== null ? fmt(pt) : '\u672a\u5f55\u5165') + '</span></div>';
+  var diff = difference();
+  html += '<div class="row"><span class="text-secondary">\u5dee\u989d</span><span class="grow"></span><span class="mono">' + (diff !== null ? fmt(diff, true) : '\u00a50') + '</span></div>';
+  html += '</div>';
+  $('resultContent').innerHTML = html;
+  openModal('resultModal');
+}
+
+// Undo & Clear & Restart
+function undoLast() {
+  if (session && session.records.length) { session.records.pop(); renderSession(); }
+}
+function askClear() {
+  showConfirm('\u786e\u8ba4\u6e05\u7a7a\u5f53\u524d\u996d\u5c40\u6240\u6709\u8bb0\u5f55\uff1f', function() {
+    session.records = [];
+    renderSession();
+  });
+}
+function askRestart() {
+  if (!session || session.records.length === 0) {
+    session = null;
+    showPage('startPage');
+    renderStart();
+    return;
+  }
+  showConfirm('\u8fd4\u56de\u5c06\u4e22\u5931\u5f53\u524d\u996d\u5c40\u8bb0\u5f55\uff0c\u786e\u5b9a\uff1f', function() {
+    session = null;
+    showPage('startPage');
+    renderStart();
+  });
+}
+
+// Init
+renderStart();
+</script>
+</body>
+</html>
