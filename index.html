@@ -5,320 +5,778 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="AA分摊">
-<title>AA 聚餐分摊</title>
+<meta name="apple-mobile-web-app-title" content="AA分账">
+<title>AA分账</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f5f5f7;--card:#fff;--border:rgba(0,0,0,.06);
-  --text:#1d1d1f;--text2:#86868b;--text3:#aeaeb2;
-  --accent:#ff9500;--accent-light:rgba(255,149,0,.1);
-  --danger:#ff3b30;--danger-light:rgba(255,59,48,.08);
-  --radius:16px;--radius-sm:12px;--radius-xs:10px;
-  --shadow:0 2px 12px rgba(0,0,0,.06);
+  --bg:#f3f4f6;
+  --surface:rgba(255,255,255,.74);
+  --surface-strong:rgba(255,255,255,.9);
+  --surface-soft:rgba(255,255,255,.56);
+  --line:rgba(15,23,42,.08);
+  --line-strong:rgba(15,23,42,.12);
+  --text:#111214;
+  --text-secondary:#6e6e73;
+  --text-tertiary:#9b9ba1;
+  --accent:#d63a43;
+  --accent-soft:rgba(214,58,67,.10);
+  --danger:#ff3b30;
+  --danger-soft:rgba(255,59,48,.08);
+  --press:rgba(17,18,20,.06);
+  --press-strong:rgba(17,18,20,.1);
+  --shadow:0 8px 28px rgba(15,23,42,.08);
+  --radius-xl:28px;
+  --radius-lg:22px;
+  --radius-md:18px;
+  --radius-sm:14px;
+  --safe-top:env(safe-area-inset-top,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
 }
-@media(prefers-color-scheme:dark){
+@media (prefers-color-scheme: dark){
   :root{
-    --bg:#000;--card:#1c1c1e;--border:rgba(255,255,255,.08);
-    --text:#f5f5f7;--text2:#98989d;--text3:#636366;
-    --shadow:0 2px 12px rgba(0,0,0,.3);
+    --bg:#0a0a0b;
+    --surface:rgba(28,28,30,.72);
+    --surface-strong:rgba(32,32,34,.9);
+    --surface-soft:rgba(28,28,30,.56);
+    --line:rgba(255,255,255,.08);
+    --line-strong:rgba(255,255,255,.12);
+    --text:#f5f5f7;
+    --text-secondary:#a0a0a8;
+    --text-tertiary:#6b6b72;
+    --accent:#ff5b66;
+    --accent-soft:rgba(255,91,102,.14);
+    --danger:#ff5b57;
+    --danger-soft:rgba(255,91,87,.12);
+    --press:rgba(255,255,255,.08);
+    --press-strong:rgba(255,255,255,.14);
+    --shadow:0 8px 28px rgba(0,0,0,.32);
   }
 }
-html{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
-  font-size:16px;color:var(--text);background:var(--bg);
-  -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
-body{min-height:100dvh;padding-bottom:calc(16px + var(--safe-bottom));overflow-x:hidden}
-.container{max-width:480px;margin:0 auto;padding:0 16px}
-.section{margin-bottom:24px}
-.section-title{font-size:13px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;padding-left:4px}
-.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--border);padding:16px;margin-bottom:12px}
-.row{display:flex;align-items:center;gap:12px}
-.grow{flex:1}
-.text-secondary{color:var(--text2);font-size:14px}
-.text-caption{color:var(--text3);font-size:12px}
-.bold{font-weight:600}
-.mono{font-variant-numeric:tabular-nums}
-
-.btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:6px;
-  border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;
-  cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;
-  padding:12px 20px;width:100%;
+html{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  font-size:16px;
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
 }
-.btn:active{transform:scale(.97);opacity:.85}
-.btn-primary{background:var(--accent);color:#fff}
-.btn-glass{background:var(--card);color:var(--text);border:1px solid var(--border);box-shadow:var(--shadow)}
-.btn-danger{background:var(--danger-light);color:var(--danger)}
-.btn-sm{padding:10px 14px;font-size:14px;border-radius:var(--radius-xs)}
-.btn:disabled{opacity:.35;pointer-events:none}
-
-.chip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.chip{
-  display:flex;align-items:center;justify-content:center;
-  padding:12px 4px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;
-  background:var(--card);border:1.5px solid var(--border);box-shadow:var(--shadow);
-  cursor:pointer;transition:all .15s ease;-webkit-user-select:none;user-select:none;
+body{
+  min-height:100dvh;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
 }
-.chip:active{transform:scale(.96)}
-.chip.selected{border-color:var(--accent);background:var(--accent-light);color:var(--accent)}
-
-.quick-row{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.quick-btn{
-  padding:11px 4px;border-radius:var(--radius-xs);font-size:15px;font-weight:700;
-  background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);
-  text-align:center;cursor:pointer;transition:all .12s ease;-webkit-user-select:none;user-select:none;
+button,input{font:inherit}
+button{appearance:none;-webkit-appearance:none}
+.container{
+  max-width:520px;
+  margin:0 auto;
+  padding:calc(18px + var(--safe-top)) 16px calc(28px + var(--safe-bottom));
 }
-.quick-btn:active{transform:scale(.94);background:var(--accent-light)}
-
-.input{
-  width:100%;padding:14px;border-radius:var(--radius-sm);
-  border:1px solid var(--border);background:var(--bg);font-size:16px;
-  color:var(--text);outline:none;transition:border-color .15s;
-}
-.input:focus{border-color:var(--accent)}
-.input::placeholder{color:var(--text3)}
-
-.summary-grid{display:grid;grid-template-columns:1fr 1fr;border-radius:var(--radius);overflow:hidden;background:var(--card);box-shadow:var(--shadow);border:1px solid var(--border)}
-.summary-cell{padding:16px;border-bottom:1px solid var(--border)}
-.summary-cell:nth-child(odd){border-right:1px solid var(--border)}
-.summary-cell .label{font-size:12px;color:var(--text2);margin-bottom:6px}
-.summary-cell .value{font-size:18px;font-weight:700;font-variant-numeric:tabular-nums}
-
-.record-item{display:flex;align-items:flex-start;gap:10px;padding:14px}
-.record-item:not(:last-child){border-bottom:1px solid var(--border)}
-.record-tag{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:var(--bg);color:var(--text2);white-space:nowrap;flex-shrink:0;margin-top:2px}
-.record-info{flex:1;min-width:0}
-.record-title{font-size:14px;font-weight:500}
-.record-sub{font-size:12px;color:var(--text2);margin-top:2px}
-.record-amount{font-size:14px;font-weight:700;white-space:nowrap;margin-top:2px;font-variant-numeric:tabular-nums}
-
-.action-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-.action-tile{
-  display:flex;align-items:center;justify-content:center;
-  padding:18px 8px;border-radius:var(--radius);
-  background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);
-  cursor:pointer;transition:all .12s;font-size:13px;font-weight:600;text-align:center;
-  -webkit-user-select:none;user-select:none;
-}
-.action-tile:active{transform:scale(.96);opacity:.85}
-
-.modal-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:100;
-  display:flex;align-items:flex-end;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .25s;
-}
-.modal-backdrop.show{opacity:1;pointer-events:auto}
-.modal{
-  width:100%;max-width:480px;max-height:85dvh;overflow-y:auto;
-  background:var(--bg);border-radius:20px 20px 0 0;
-  padding:20px 16px calc(20px + var(--safe-bottom));
-  transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);
-}
-.modal-backdrop.show .modal{transform:translateY(0)}
-.modal-title{font-size:18px;font-weight:700;margin-bottom:16px;text-align:center}
-.modal-close{font-size:14px;font-weight:600;color:var(--accent);cursor:pointer;padding:8px}
-
-.participant-row{
-  display:flex;align-items:center;padding:14px 0;border-bottom:1px solid var(--border);
-  cursor:pointer;-webkit-user-select:none;user-select:none;
-}
-.participant-row .name{flex:1;font-size:15px}
-.check-circle{
-  width:24px;height:24px;border-radius:50%;border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;transition:all .15s;font-size:14px;
-}
-.check-circle.checked{background:var(--text);border-color:var(--text);color:var(--card)}
-
-.select-all-row{
-  display:flex;align-items:center;padding:10px 0 6px;cursor:pointer;
-  -webkit-user-select:none;user-select:none;
-}
-.select-all-row .label{flex:1;font-size:14px;font-weight:600;color:var(--accent)}
-
 .page{display:none}
 .page.active{display:block}
-.page-header{padding:20px 0 8px}
-.page-header h1{font-size:32px;font-weight:800;letter-spacing:-.8px}
-.page-header p{color:var(--text2);font-size:14px;margin-top:6px}
-
-.bottom-action{
-  position:sticky;bottom:0;left:0;right:0;
-  padding:12px 16px calc(12px + var(--safe-bottom));
-  background:linear-gradient(transparent,var(--bg) 20%);
-  pointer-events:none;
+.eyebrow{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-secondary);
 }
-.bottom-action .btn{pointer-events:auto}
-
-/* Confirm dialog */
+.hero{
+  padding:26px 22px;
+  border-radius:var(--radius-xl);
+  background:var(--surface);
+  border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(24px) saturate(1.16);
+  backdrop-filter:blur(24px) saturate(1.16);
+  box-shadow:var(--shadow);
+}
+.hero h1{
+  margin-top:10px;
+  font-size:34px;
+  line-height:1.05;
+  letter-spacing:-.04em;
+  font-weight:800;
+}
+.hero p{
+  margin-top:10px;
+  color:var(--text-secondary);
+  line-height:1.55;
+  font-size:15px;
+}
+.section{margin-top:22px}
+.section-title{
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--text-secondary);
+  margin-bottom:12px;
+  padding-left:4px;
+}
+.glass-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius-lg);
+  -webkit-backdrop-filter:blur(22px) saturate(1.14);
+  backdrop-filter:blur(22px) saturate(1.14);
+  box-shadow:var(--shadow);
+}
+.count-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+}
+.chip{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:54px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:var(--surface-soft);
+  -webkit-backdrop-filter:blur(16px) saturate(1.12);
+  backdrop-filter:blur(16px) saturate(1.12);
+  color:var(--text);
+  font-size:15px;
+  font-weight:700;
+  transition:transform .14s ease,border-color .14s ease,background .14s ease,color .14s ease;
+  user-select:none;
+  cursor:pointer;
+}
+.chip:active{transform:scale(.97);background:var(--accent-soft);border-color:rgba(214,58,67,.34);color:var(--accent)}
+.chip.selected{
+  border-color:rgba(214,58,67,.34);
+  background:var(--accent-soft);
+  color:var(--accent);
+}
+.names-card{padding:14px}
+.name-row + .name-row{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid var(--line);
+}
+.name-label{
+  font-size:13px;
+  color:var(--text-secondary);
+  margin-bottom:8px;
+  padding-left:2px;
+}
+.input{
+  width:100%;
+  min-height:48px;
+  padding:0 14px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--surface-strong);
+  color:var(--text);
+  outline:none;
+  transition:border-color .15s ease,background .15s ease;
+}
+.input:focus{border-color:rgba(214,58,67,.35)}
+.input::placeholder{color:var(--text-tertiary)}
+.primary-dock{
+  position:sticky;
+  bottom:0;
+  margin-top:22px;
+  padding-top:18px;
+  background:linear-gradient(transparent,var(--bg) 26%);
+}
+.btn{
+  width:100%;
+  min-height:52px;
+  border:none;
+  border-radius:16px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:0 18px;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  transition:transform .14s ease,opacity .14s ease,background .14s ease,border-color .14s ease;
+}
+.btn:active{transform:scale(.985)}
+.btn:disabled{opacity:.35;pointer-events:none}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:active{background:#c8323c}
+.btn-secondary{
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text);
+  -webkit-backdrop-filter:blur(18px) saturate(1.12);
+  backdrop-filter:blur(18px) saturate(1.12);
+}
+.btn-secondary:active{background:var(--accent-soft);border-color:rgba(214,58,67,.34);color:var(--accent)}
+.btn-danger{background:var(--danger-soft);color:var(--danger);border:1px solid rgba(255,59,48,.14)}
+.btn-danger:active{background:rgba(255,59,48,.16)}
+.btn-small{
+  min-height:42px;
+  border-radius:14px;
+  font-size:14px;
+  font-weight:700;
+}
+.topbar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:18px;
+}
+.topbar h2{
+  margin-top:6px;
+  font-size:30px;
+  line-height:1.05;
+  letter-spacing:-.04em;
+  font-weight:800;
+}
+.text-link{
+  border:none;
+  background:none;
+  color:var(--accent);
+  font-size:15px;
+  font-weight:700;
+  padding:6px 0;
+  white-space:nowrap;
+  transition:opacity .14s ease;
+}
+.text-link:active{opacity:.66}
+.summary-card{padding:22px}
+.summary-label{
+  color:var(--text-secondary);
+  font-size:13px;
+  font-weight:600;
+}
+.summary-total{
+  margin-top:8px;
+  font-size:42px;
+  line-height:1;
+  letter-spacing:-.05em;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+}
+.summary-meta{
+  margin-top:18px;
+  padding-top:16px;
+  border-top:1px solid var(--line);
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+.meta-item .meta-key{
+  font-size:12px;
+  color:var(--text-secondary);
+  margin-bottom:6px;
+}
+.meta-item .meta-value{
+  font-size:16px;
+  font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.meta-item .meta-value.subtle{color:var(--text-secondary)}
+.stack{display:flex;flex-direction:column;gap:12px}
+.person-card{padding:18px}
+.person-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:16px;
+}
+.person-name{
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+.person-meta{
+  margin-top:6px;
+  font-size:13px;
+  color:var(--text-secondary);
+  line-height:1.45;
+}
+.person-amount{
+  text-align:right;
+}
+.person-amount .label{
+  font-size:12px;
+  color:var(--text-secondary);
+  margin-bottom:6px;
+}
+.person-amount .value{
+  font-size:28px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums;
+}
+.quick-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.quick-btn{
+  min-height:42px;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:var(--surface-strong);
+  color:var(--text);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  user-select:none;
+  transition:transform .12s ease,border-color .12s ease,background .12s ease,color .12s ease;
+}
+.quick-btn:active{transform:scale(.97);background:var(--accent-soft);border-color:rgba(214,58,67,.34);color:var(--accent)}
+.quick-btn.person-quick:active{background:var(--tone-soft, var(--accent-soft));border-color:var(--tone-line, rgba(214,58,67,.34));color:var(--tone-solid, var(--accent))}
+.quick-btn.selected,
+.quick-btn.is-selected{
+  border-color:rgba(214,58,67,.34);
+  background:var(--accent-soft);
+  color:var(--accent);
+}
+.action-list{overflow:hidden}
+.action-row{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:16px 18px;
+  border:none;
+  background:transparent;
+  color:var(--text);
+  text-align:left;
+  cursor:pointer;
+}
+.action-row + .action-row{border-top:1px solid var(--line)}
+.action-row:active{background:var(--accent-soft)}
+.action-row-title{
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.action-row-sub{
+  margin-top:3px;
+  font-size:13px;
+  color:var(--text-secondary);
+}
+.chevron{
+  color:var(--text-tertiary);
+  font-size:20px;
+  line-height:1;
+}
+.record-list{overflow:hidden}
+.record-empty{padding:18px;color:var(--text-secondary);line-height:1.55}
+.record-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:16px 18px;
+}
+.record-item + .record-item{border-top:1px solid var(--line)}
+.record-tag{
+  min-width:46px;
+  height:28px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+  font-weight:700;
+  flex-shrink:0;
+  background:var(--surface-strong);
+  border:1px solid var(--line);
+  color:var(--text-secondary);
+}
+.record-tag.personal{color:var(--text)}
+.record-tag.shared{color:#fff;background:var(--accent);border-color:var(--accent)}
+.record-tag.payment{color:var(--text-secondary)}
+.record-info{flex:1;min-width:0}
+.record-title{font-size:15px;font-weight:600;line-height:1.35}
+.record-sub{margin-top:4px;font-size:13px;color:var(--text-secondary);line-height:1.4}
+.record-amount{font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.utility-card{padding:14px}
+.utility-row{display:flex;gap:10px}
+.utility-row + .utility-row{margin-top:10px}
+.sheet-backdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.36);
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .22s ease;
+  z-index:100;
+}
+.sheet-backdrop.show{opacity:1;pointer-events:auto}
+.sheet{
+  width:100%;
+  max-width:520px;
+  max-height:86dvh;
+  overflow-y:auto;
+  padding:10px 16px calc(24px + var(--safe-bottom));
+  border-radius:28px 28px 0 0;
+  background:var(--surface-strong);
+  border:1px solid var(--line);
+  box-shadow:0 -10px 30px rgba(0,0,0,.12);
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+}
+.sheet-backdrop.show .sheet{transform:translateY(0)}
+.sheet-handle{
+  width:38px;
+  height:5px;
+  border-radius:999px;
+  background:var(--line-strong);
+  margin:0 auto 14px;
+}
+.sheet-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:18px;
+}
+.sheet-title{
+  font-size:21px;
+  line-height:1.15;
+  font-weight:800;
+  letter-spacing:-.03em;
+}
+.sheet-close{
+  border:none;
+  background:none;
+  color:var(--accent);
+  font-size:15px;
+  font-weight:700;
+}
+.sheet-section + .sheet-section{margin-top:18px}
+.sheet-card{
+  padding:14px;
+  border-radius:18px;
+  background:var(--surface);
+  border:1px solid var(--line);
+}
+.participant-row{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:14px 2px;
+  cursor:pointer;
+  user-select:none;
+}
+.participant-row + .participant-row{border-top:1px solid var(--line)}
+.participant-row .name{flex:1;font-size:15px;font-weight:600}
+.check-circle{
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  border:1.5px solid var(--line-strong);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  color:#fff;
+  transition:border-color .14s ease,background .14s ease;
+}
+.check-circle.checked{background:var(--accent);border-color:var(--accent)}
+.select-all-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:2px 2px 10px;
+  color:var(--accent);
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.support-text{
+  font-size:13px;
+  color:var(--text-secondary);
+  line-height:1.5;
+}
+.result-stack{display:flex;flex-direction:column;gap:12px}
+.result-card{padding:18px}
+.result-name{font-size:17px;font-weight:700;margin-bottom:14px}
+.result-line{display:flex;align-items:center;gap:10px;font-size:14px}
+.result-line + .result-line{margin-top:8px}
+.result-line .k{color:var(--text-secondary)}
+.result-line .v{margin-left:auto;font-variant-numeric:tabular-nums;font-weight:700}
+.result-line.emphasis{margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.result-line.emphasis .k,
+.result-line.emphasis .v{font-size:16px;color:var(--text)}
 .confirm-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;transition:opacity .2s;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.42);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .18s ease;
+  z-index:200;
 }
 .confirm-backdrop.show{opacity:1;pointer-events:auto}
 .confirm-box{
-  width:280px;background:var(--card);border-radius:14px;overflow:hidden;
-  text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.18);
-  transform:scale(.9);transition:transform .2s cubic-bezier(.32,.72,0,1);
+  width:min(320px,calc(100vw - 32px));
+  border-radius:24px;
+  overflow:hidden;
+  background:var(--surface-strong);
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+  transform:scale(.94);
+  transition:transform .2s cubic-bezier(.32,.72,0,1);
 }
 .confirm-backdrop.show .confirm-box{transform:scale(1)}
-.confirm-msg{padding:20px 16px 14px;font-size:15px;font-weight:500;line-height:1.5}
-.confirm-actions{display:flex;border-top:1px solid var(--border)}
-.confirm-actions button{
-  flex:1;padding:14px;font-size:15px;font-weight:600;border:none;
-  background:transparent;cursor:pointer;color:var(--accent);
+.confirm-msg{
+  padding:24px 20px 18px;
+  text-align:center;
+  line-height:1.55;
+  font-size:15px;
+  font-weight:600;
 }
-.confirm-actions button:first-child{border-right:1px solid var(--border);color:var(--text2)}
-.confirm-actions button.destructive{color:var(--danger)}
+.confirm-actions{display:flex;border-top:1px solid var(--line)}
+.confirm-actions button{
+  flex:1;
+  min-height:52px;
+  border:none;
+  background:transparent;
+  font-size:15px;
+  font-weight:700;
+  color:var(--accent);
+}
+.confirm-actions button + button{border-left:1px solid var(--line)}
+.confirm-actions .cancel{color:var(--text-secondary)}
+.confirm-actions .destructive{color:var(--danger)}
+@media (max-width:420px){
+  .summary-total{font-size:38px}
+  .person-amount .value{font-size:24px}
+  .quick-row{gap:6px}
+}
 </style>
 </head>
 <body>
 
-<!-- START PAGE -->
 <div id="startPage" class="page active">
-<div class="container">
-  <div class="page-header">
-    <h1>AA 聚餐分摊</h1>
-    <p>先把这一桌的人定下来，再开始记每一笔。</p>
+  <div class="container">
+    <div class="hero">
+      <div class="eyebrow">AA分账</div>
+      <h1>你吃你的，我吃我的！</h1>
+      <p>单点、共享菜和折扣，都会自动算清。</p>
+    </div>
+
+    <div class="section">
+      <div class="section-title">人数</div>
+      <div id="countGrid" class="count-grid"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">成员名字</div>
+      <div id="namesCard" class="glass-card names-card"></div>
+    </div>
+
+    <div class="primary-dock">
+      <button class="btn btn-primary" onclick="startSession()">开始记账</button>
+    </div>
   </div>
-  <div class="section">
-    <div class="section-title">这桌有几个人？</div>
-    <div class="chip-grid" id="countGrid"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">成员名字（可选）</div>
-    <div class="card" id="namesCard"></div>
-  </div>
-</div>
-<div class="bottom-action container">
-  <button class="btn btn-primary" onclick="startSession()">开始记账</button>
-</div>
 </div>
 
-<!-- SESSION PAGE -->
 <div id="sessionPage" class="page">
-<div class="container" style="padding-top:16px">
-  <div class="section">
-    <div class="section-title">本桌汇总</div>
-    <div class="summary-grid">
-      <div class="summary-cell"><div class="label">本桌人数</div><div class="value" id="sumCount">-</div></div>
-      <div class="summary-cell"><div class="label">原始总额</div><div class="value" id="sumOriginal">¥0</div></div>
-      <div class="summary-cell"><div class="label">最终实付</div><div class="value" id="sumPayment">未录入</div></div>
-      <div class="summary-cell"><div class="label">当前差额</div><div class="value" id="sumDiff">待计算</div></div>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div class="eyebrow">当前饭局</div>
+        <h2>本桌账单</h2>
+      </div>
+      <button class="text-link" onclick="openResultModal()">查看结算</button>
+    </div>
+
+    <div class="glass-card summary-card">
+      <div class="summary-label">当前原始总额</div>
+      <div class="summary-total" id="sumOriginal">¥0</div>
+      <div class="summary-meta">
+        <div class="meta-item">
+          <div class="meta-key">本桌人数</div>
+          <div class="meta-value" id="sumCount">-</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">最终实付</div>
+          <div class="meta-value subtle" id="sumPayment">未录入</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">当前差额</div>
+          <div class="meta-value subtle" id="sumDiff">待计算</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">成员</div>
+      <div id="participantCards" class="stack"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">操作</div>
+      <div class="glass-card action-list">
+        <button class="action-row" onclick="openSharedModal()">
+          <div>
+            <div class="action-row-title">新增共享菜</div>
+            <div class="action-row-sub">给多人平摊一笔金额，适合大家都吃了的菜。</div>
+          </div>
+          <div class="chevron">›</div>
+        </button>
+        <button class="action-row" onclick="openPaymentModal()">
+          <div>
+            <div class="action-row-title">录入实付</div>
+            <div class="action-row-sub">把优惠、服务费或最终付款补进去，自动按占比分摊。</div>
+          </div>
+          <div class="chevron">›</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">本局记录</div>
+      <div id="recordList" class="glass-card record-list">
+        <div class="record-empty">还没有记录，先给其中一个人记一笔，或者新增共享菜。</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">纠错与重置</div>
+      <div class="glass-card utility-card">
+        <div class="utility-row">
+          <button class="btn btn-secondary btn-small" id="undoBtn" onclick="undoLast()" disabled>撤销最后一笔</button>
+          <button class="btn btn-danger btn-small" id="clearBtn" onclick="askClear()" disabled>一键清空</button>
+        </div>
+        <div class="utility-row">
+          <button class="btn btn-secondary btn-small" onclick="askRestart()">重置全部信息</button>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="section">
-    <div class="section-title">成员记账</div>
-    <div id="participantCards"></div>
-  </div>
-  <div class="section">
-    <div class="section-title">快捷操作</div>
-    <div class="action-grid">
-      <div class="action-tile" onclick="openSharedModal()">新增共享菜</div>
-      <div class="action-tile" onclick="openPaymentModal()">录入实付</div>
-      <div class="action-tile" onclick="openResultModal()">结算结果</div>
+</div>
+
+<div class="sheet-backdrop" id="diyModal">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title" id="diyTitle">记一笔</div>
+      <button class="sheet-close" onclick="closeModal('diyModal')">完成</button>
     </div>
-  </div>
-  <div class="section">
-    <div class="section-title">本局记录</div>
-    <div class="card" id="recordList" style="padding:0;overflow:hidden">
-      <div style="padding:16px" class="text-secondary">还没有记录，先点一个价格试试。</div>
+    <div class="sheet-section">
+      <input class="input" id="diyInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01">
+      <div class="support-text" style="margin-top:10px;padding-left:2px">支持小数，显示最多保留两位。</div>
     </div>
-  </div>
-  <div class="section">
-    <div class="section-title">纠错与重置</div>
-    <div class="row">
-      <button class="btn btn-glass grow btn-sm" id="undoBtn" onclick="undoLast()" disabled>撤销最后一笔</button>
-      <button class="btn btn-danger grow btn-sm" id="clearBtn" onclick="askClear()" disabled>一键清空</button>
-    </div>
-    <div style="margin-top:12px">
-      <button class="btn btn-glass btn-sm" onclick="askRestart()">重新设置</button>
+    <div class="sheet-section">
+      <button class="btn btn-primary" onclick="confirmDIY()">加入记录</button>
     </div>
   </div>
 </div>
-</div>
 
-<!-- DIY Modal -->
-<div class="modal-backdrop" id="diyModal">
-<div class="modal">
-  <div class="row" style="margin-bottom:16px">
-    <span class="grow modal-title" id="diyTitle">记一笔</span>
-    <span class="modal-close" onclick="closeModal('diyModal')">完成</span>
-  </div>
-  <input class="input" id="diyInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01">
-  <p class="text-caption" style="margin:8px 0 16px 4px">支持小数，显示最多保留两位。</p>
-  <button class="btn btn-primary" onclick="confirmDIY()">加入记录</button>
-</div>
-</div>
+<div class="sheet-backdrop" id="sharedModal">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">新增共享菜</div>
+      <button class="sheet-close" onclick="closeModal('sharedModal')">取消</button>
+    </div>
 
-<!-- Shared Modal -->
-<div class="modal-backdrop" id="sharedModal">
-<div class="modal">
-  <div class="row" style="margin-bottom:16px">
-    <span class="grow modal-title">新增共享菜</span>
-    <span class="modal-close" onclick="closeModal('sharedModal')">取消</span>
-  </div>
-  <div class="section-title">金额</div>
-  <div class="quick-row" style="margin-bottom:8px" id="sharedQuickRow"></div>
-  <input class="input" id="sharedAmountInput" type="number" inputmode="decimal" placeholder="DIY 金额" step="0.01" style="margin-bottom:16px">
-  <div class="section-title">参与分摊的人</div>
-  <div id="sharedSelectAll"></div>
-  <div id="sharedParticipants" style="margin-bottom:16px"></div>
-  <div id="sharedPreview" class="text-secondary" style="margin-bottom:16px"></div>
-  <button class="btn btn-primary" id="sharedConfirmBtn" onclick="confirmShared()" disabled>加入记录</button>
-</div>
-</div>
+    <div class="sheet-section">
+      <div class="section-title">金额</div>
+      <div id="sharedQuickRow" class="quick-row" style="margin-bottom:10px"></div>
+      <input class="input" id="sharedAmountInput" type="number" inputmode="decimal" placeholder="DIY 金额" step="0.01">
+    </div>
 
-<!-- Payment Modal -->
-<div class="modal-backdrop" id="paymentModal">
-<div class="modal">
-  <div class="row" style="margin-bottom:16px">
-    <span class="grow modal-title">录入实付</span>
-    <span class="modal-close" onclick="closeModal('paymentModal')">完成</span>
-  </div>
-  <div class="section-title">已录入实付</div>
-  <div id="paymentList" class="text-secondary" style="margin-bottom:16px">还没有实付记录</div>
-  <div class="section-title">新增一笔实付</div>
-  <input class="input" id="paymentInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01" style="margin-bottom:12px">
-  <button class="btn btn-glass" onclick="addPayment()">添加</button>
-  <div style="margin-top:16px;padding:14px;background:var(--bg);border-radius:var(--radius-sm)">
-    <div class="row" style="margin-bottom:6px"><span class="text-secondary">原始总额</span><span class="grow"></span><span class="bold mono" id="payOriginal">¥0</span></div>
-    <div class="row" style="margin-bottom:6px"><span class="text-secondary">实付总额</span><span class="grow"></span><span class="bold mono" id="payTotal">未录入</span></div>
-    <div class="row"><span class="text-secondary">当前差额</span><span class="grow"></span><span class="bold mono" id="payDiff">待计算</span></div>
-    <p class="text-caption" style="margin-top:8px">差额按每个人原始消费占比分摊。</p>
+    <div class="sheet-section">
+      <div class="section-title">参与分摊的人</div>
+      <div class="sheet-card">
+        <div id="sharedSelectAll"></div>
+        <div id="sharedParticipants"></div>
+      </div>
+    </div>
+
+    <div class="sheet-section">
+      <div id="sharedPreview" class="support-text">请选择金额和成员</div>
+    </div>
+
+    <div class="sheet-section">
+      <button class="btn btn-primary" id="sharedConfirmBtn" onclick="confirmShared()" disabled>加入记录</button>
+    </div>
   </div>
 </div>
-</div>
 
-<!-- Result Modal -->
-<div class="modal-backdrop" id="resultModal">
-<div class="modal">
-  <div class="row" style="margin-bottom:16px">
-    <span class="grow modal-title">结算结果</span>
-    <span class="modal-close" onclick="closeModal('resultModal')">返回</span>
+<div class="sheet-backdrop" id="paymentModal">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">录入实付</div>
+      <button class="sheet-close" onclick="closeModal('paymentModal')">完成</button>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-title">已录入实付</div>
+      <div id="paymentList" class="sheet-card support-text">还没有实付记录</div>
+    </div>
+
+    <div class="sheet-section">
+      <div class="section-title">新增一笔实付</div>
+      <input class="input" id="paymentInput" type="number" inputmode="decimal" placeholder="输入金额" step="0.01" style="margin-bottom:12px">
+      <button class="btn btn-secondary" onclick="addPayment()">添加</button>
+    </div>
+
+    <div class="sheet-section">
+      <div class="sheet-card">
+        <div class="result-line"><span class="k">原始总额</span><span class="v" id="payOriginal">¥0</span></div>
+        <div class="result-line"><span class="k">实付总额</span><span class="v" id="payTotal">未录入</span></div>
+        <div class="result-line emphasis"><span class="k">当前差额</span><span class="v" id="payDiff">待计算</span></div>
+        <div class="support-text" style="margin-top:10px">差额会按每个人原始消费占比分摊。</div>
+      </div>
+    </div>
   </div>
-  <div id="resultContent"></div>
-</div>
 </div>
 
-<!-- Confirm Dialog -->
+<div class="sheet-backdrop" id="resultModal">
+  <div class="sheet">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <div class="sheet-title">结算结果</div>
+      <button class="sheet-close" onclick="closeModal('resultModal')">返回</button>
+    </div>
+    <div id="resultContent"></div>
+  </div>
+</div>
+
 <div class="confirm-backdrop" id="confirmDialog">
   <div class="confirm-box">
     <div class="confirm-msg" id="confirmMsg"></div>
     <div class="confirm-actions">
-      <button onclick="closeConfirm()">取消</button>
+      <button class="cancel" onclick="closeConfirm()">取消</button>
       <button class="destructive" id="confirmOk">确认</button>
     </div>
   </div>
 </div>
 
 <script>
-// State
 let participantCount = 2;
-let names = Array(8).fill('');
+let names = Array(8).fill("");
 let session = null;
 const QUICK = [8, 10, 15, 20];
+const PERSON_PALETTE = [
+  { solid: "#0A84FF", soft: "rgba(10,132,255,.12)", line: "rgba(10,132,255,.24)" },
+  { solid: "#30B0C7", soft: "rgba(48,176,199,.12)", line: "rgba(48,176,199,.24)" },
+  { solid: "#FF9F0A", soft: "rgba(255,159,10,.12)", line: "rgba(255,159,10,.24)" },
+  { solid: "#5E5CE6", soft: "rgba(94,92,230,.12)", line: "rgba(94,92,230,.24)" },
+  { solid: "#32D74B", soft: "rgba(50,215,75,.12)", line: "rgba(50,215,75,.24)" },
+  { solid: "#BF5AF2", soft: "rgba(191,90,242,.12)", line: "rgba(191,90,242,.24)" }
+];
 let diyTargetId = null;
 let sharedSelectedAmount = null;
 let sharedSelectedIds = new Set();
@@ -326,78 +784,101 @@ let confirmCallback = null;
 
 const $ = id => document.getElementById(id);
 
-// Format
 function fmt(v, signed) {
   const n = Math.round(v * 100) / 100;
   const abs = Math.abs(n);
-  const s = abs % 1 === 0 ? abs.toString() : abs.toFixed(2).replace(/0+$/, '').replace(/\.$/, '');
+  const s = abs % 1 === 0 ? abs.toString() : abs.toFixed(2).replace(/0+$/, "").replace(/\.$/, "");
   if (signed) {
-    if (n > 0.001) return '+\u00a5' + s;
-    if (n < -0.001) return '-\u00a5' + s;
-    return '\u00a50';
+    if (n > 0.001) return "+¥" + s;
+    if (n < -0.001) return "-¥" + s;
+    return "¥0";
   }
-  return '\u00a5' + s;
+  return "¥" + s;
 }
-function uid() { return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2); }
 
-// Confirm dialog
-function showConfirm(msg, cb) {
-  $('confirmMsg').textContent = msg;
-  confirmCallback = cb;
-  $('confirmDialog').classList.add('show');
+function uid() {
+  return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).slice(2);
 }
-function closeConfirm() { $('confirmDialog').classList.remove('show'); confirmCallback = null; }
-$('confirmOk').onclick = function() {
-  $('confirmDialog').classList.remove('show');
-  if (confirmCallback) { confirmCallback(); confirmCallback = null; }
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function showConfirm(msg, cb) {
+  $("confirmMsg").textContent = msg;
+  confirmCallback = cb;
+  $("confirmDialog").classList.add("show");
+}
+
+function closeConfirm() {
+  $("confirmDialog").classList.remove("show");
+  confirmCallback = null;
+}
+
+$("confirmOk").onclick = function() {
+  $("confirmDialog").classList.remove("show");
+  if (confirmCallback) {
+    confirmCallback();
+    confirmCallback = null;
+  }
 };
 
-// Pages
 function showPage(id) {
-  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
-  $(id).classList.add('active');
+  document.querySelectorAll(".page").forEach(function(p) { p.classList.remove("active"); });
+  $(id).classList.add("active");
 }
 
-// Modal
-function openModal(id) { $(id).classList.add('show'); }
-function closeModal(id) { $(id).classList.remove('show'); }
-document.querySelectorAll('.modal-backdrop').forEach(function(el) {
-  el.addEventListener('click', function(e) { if (e.target === el) el.classList.remove('show'); });
+function openModal(id) { $(id).classList.add("show"); }
+function closeModal(id) { $(id).classList.remove("show"); }
+
+document.querySelectorAll(".sheet-backdrop").forEach(function(el) {
+  el.addEventListener("click", function(e) {
+    if (e.target === el) el.classList.remove("show");
+  });
 });
 
-// ===== START PAGE =====
 function renderStart() {
-  var grid = $('countGrid');
-  grid.innerHTML = '';
+  var grid = $("countGrid");
+  grid.innerHTML = "";
   for (var i = 2; i <= 8; i++) {
-    var el = document.createElement('div');
-    el.className = 'chip' + (i === participantCount ? ' selected' : '');
-    el.textContent = i + ' \u4eba';
-    el.setAttribute('data-count', i);
+    var el = document.createElement("div");
+    el.className = "chip" + (i === participantCount ? " selected" : "");
+    el.textContent = i + " 人";
+    el.setAttribute("data-count", i);
     el.onclick = function() {
-      participantCount = parseInt(this.getAttribute('data-count'));
+      participantCount = parseInt(this.getAttribute("data-count"), 10);
       renderStart();
     };
     grid.appendChild(el);
   }
-  var card = $('namesCard');
-  card.innerHTML = '';
-  for (var i = 0; i < participantCount; i++) {
-    var wrap = document.createElement('div');
-    if (i > 0) wrap.style.marginTop = '12px';
-    var label = document.createElement('div');
-    label.className = 'text-caption';
-    label.style.marginBottom = '6px';
-    label.textContent = '\u6210\u5458 ' + (i + 1);
-    wrap.appendChild(label);
-    var inp = document.createElement('input');
-    inp.className = 'input';
-    inp.placeholder = '\u7559\u7a7a\u5219\u9ed8\u8ba4\u663e\u793a\u4e3a\u6210\u5458 ' + (i + 1);
-    inp.value = names[i];
-    inp.setAttribute('data-idx', i);
-    inp.oninput = function() { names[parseInt(this.getAttribute('data-idx'))] = this.value; };
-    wrap.appendChild(inp);
-    card.appendChild(wrap);
+
+  var card = $("namesCard");
+  card.innerHTML = "";
+  for (var j = 0; j < participantCount; j++) {
+    var row = document.createElement("div");
+    row.className = "name-row";
+
+    var label = document.createElement("div");
+    label.className = "name-label";
+    label.textContent = "成员 " + (j + 1);
+    row.appendChild(label);
+
+    var input = document.createElement("input");
+    input.className = "input";
+    input.placeholder = "留空则默认显示为成员 " + (j + 1);
+    input.value = names[j];
+    input.setAttribute("data-idx", j);
+    input.oninput = function() {
+      names[parseInt(this.getAttribute("data-idx"), 10)] = this.value;
+    };
+
+    row.appendChild(input);
+    card.appendChild(row);
   }
 }
 
@@ -405,45 +886,59 @@ function startSession() {
   var participants = [];
   for (var i = 0; i < participantCount; i++) {
     var raw = names[i].trim();
-    participants.push({ id: uid(), name: raw || ('\u6210\u5458 ' + (i + 1)) });
+    participants.push({ id: uid(), name: raw || ("成员 " + (i + 1)) });
   }
   session = { participants: participants, records: [] };
-  showPage('sessionPage');
+  showPage("sessionPage");
   renderSession();
 }
 
-// ===== SESSION =====
 function pName(id) {
   for (var i = 0; i < session.participants.length; i++) {
     if (session.participants[i].id === id) return session.participants[i].name;
   }
-  return '\u672a\u77e5';
+  return "未知";
+}
+
+function participantTone(pid) {
+  var idx = 0;
+  for (var i = 0; i < session.participants.length; i++) {
+    if (session.participants[i].id === pid) {
+      idx = i;
+      break;
+    }
+  }
+  return PERSON_PALETTE[idx % PERSON_PALETTE.length];
 }
 
 function originalTotal() {
   var t = 0;
   for (var i = 0; i < session.records.length; i++) {
-    if (session.records[i].kind !== 'payment') t += session.records[i].amount;
+    if (session.records[i].kind !== "payment") t += session.records[i].amount;
   }
   return t;
 }
+
 function paymentTotal() {
-  var pays = session.records.filter(function(r) { return r.kind === 'payment'; });
+  var pays = session.records.filter(function(r) { return r.kind === "payment"; });
   return pays.length ? pays.reduce(function(s, r) { return s + r.amount; }, 0) : null;
 }
+
 function difference() {
   var pt = paymentTotal();
   return pt !== null ? pt - originalTotal() : null;
 }
+
 function originalAmount(pid) {
   var total = 0;
   for (var i = 0; i < session.records.length; i++) {
     var r = session.records[i];
-    if (r.kind === 'personal' && r.participantId === pid) total += r.amount;
-    if (r.kind === 'shared' && r.participantIds.indexOf(pid) >= 0) total += r.amount / r.participantIds.length;
+    if (r.kind === "personal" && r.participantId === pid) total += r.amount;
+    if (r.kind === "shared" && r.participantIds.indexOf(pid) >= 0) total += r.amount / r.participantIds.length;
   }
   return total;
 }
+
 function adjustment(pid) {
   var diff = difference();
   var ot = originalTotal();
@@ -451,122 +946,175 @@ function adjustment(pid) {
   var oa = originalAmount(pid);
   return oa > 0 ? diff * oa / ot : 0;
 }
-function finalAmount(pid) { return originalAmount(pid) + adjustment(pid); }
+
+function finalAmount(pid) {
+  return originalAmount(pid) + adjustment(pid);
+}
 
 function renderSession() {
   if (!session) return;
-  $('sumCount').textContent = session.participants.length + ' \u4eba';
-  $('sumOriginal').textContent = fmt(originalTotal());
-  var pt = paymentTotal();
-  $('sumPayment').textContent = pt !== null ? fmt(pt) : '\u672a\u5f55\u5165';
-  var diff = difference();
-  $('sumDiff').textContent = diff !== null ? fmt(diff, true) : '\u5f85\u8ba1\u7b97';
 
-  var container = $('participantCards');
-  container.innerHTML = '';
+  $("sumCount").textContent = session.participants.length + " 人";
+  $("sumOriginal").textContent = fmt(originalTotal());
+  var pt = paymentTotal();
+  $("sumPayment").textContent = pt !== null ? fmt(pt) : "未录入";
+  var diff = difference();
+  $("sumDiff").textContent = diff !== null ? fmt(diff, true) : "待计算";
+  $("sumPayment").className = "meta-value" + (pt !== null ? "" : " subtle");
+  $("sumDiff").className = "meta-value" + (diff !== null ? "" : " subtle");
+
+  var container = $("participantCards");
+  container.innerHTML = "";
+
   for (var i = 0; i < session.participants.length; i++) {
     var p = session.participants[i];
     var oa = originalAmount(p.id);
     var adj = adjustment(p.id);
     var fa = finalAmount(p.id);
-    var card = document.createElement('div');
-    card.className = 'card';
-    var quickBtns = '';
+    var tone = participantTone(p.id);
+    var quickBtns = "";
+
     for (var q = 0; q < QUICK.length; q++) {
-      quickBtns += '<div class="quick-btn" data-amt="' + QUICK[q] + '" data-pid="' + p.id + '">' + QUICK[q] + '</div>';
+      quickBtns += '<div class="quick-btn person-quick" style="--tone-solid:' + tone.solid + ';--tone-soft:' + tone.soft + ';--tone-line:' + tone.line + '" data-amt="' + QUICK[q] + '" data-pid="' + p.id + '">' + QUICK[q] + '</div>';
     }
-    quickBtns += '<div class="quick-btn" data-diy="1" data-pid="' + p.id + '" data-pname="' + p.name + '">DIY</div>';
-    card.innerHTML = '<div class="row" style="margin-bottom:12px">' +
-      '<div class="grow"><div style="font-size:17px;font-weight:600">' + p.name + '</div>' +
-      '<div class="text-caption" style="margin-top:4px">\u539f\u59cb ' + fmt(oa) + ' \u00b7 \u6821\u6b63 ' + fmt(adj, true) + '</div></div>' +
-      '<div style="text-align:right"><div class="text-caption">\u5e94\u4ed8</div>' +
-      '<div style="font-size:18px;font-weight:700;font-variant-numeric:tabular-nums">' + fmt(fa) + '</div></div></div>' +
+    quickBtns += '<div class="quick-btn person-quick" style="--tone-solid:' + tone.solid + ';--tone-soft:' + tone.soft + ';--tone-line:' + tone.line + '" data-diy="1" data-pid="' + p.id + '" data-pname="' + escapeHtml(p.name) + '">DIY</div>';
+
+    var card = document.createElement("div");
+    card.className = "glass-card person-card";
+    card.innerHTML =
+      '<div class="person-head">' +
+        '<div>' +
+          '<div class="person-name" style="color:' + tone.solid + '">' + escapeHtml(p.name) + '</div>' +
+          '<div class="person-meta">原始 ' + fmt(oa) + '<br>校正 ' + fmt(adj, true) + '</div>' +
+        '</div>' +
+        '<div class="person-amount">' +
+          '<div class="label">最终应付</div>' +
+          '<div class="value">' + fmt(fa) + '</div>' +
+        '</div>' +
+      '</div>' +
       '<div class="quick-row">' + quickBtns + '</div>';
     container.appendChild(card);
   }
-  // Bind quick buttons
+
   container.querySelectorAll('.quick-btn[data-amt]').forEach(function(btn) {
     btn.onclick = function() {
       addPersonal(parseFloat(this.getAttribute('data-amt')), this.getAttribute('data-pid'));
     };
   });
+
   container.querySelectorAll('.quick-btn[data-diy]').forEach(function(btn) {
     btn.onclick = function() {
       openDIY(this.getAttribute('data-pid'), this.getAttribute('data-pname'));
     };
   });
 
-  // Records
-  var rl = $('recordList');
+  var rl = $("recordList");
   if (session.records.length === 0) {
-    rl.innerHTML = '<div style="padding:16px" class="text-secondary">\u8fd8\u6ca1\u6709\u8bb0\u5f55\uff0c\u5148\u70b9\u4e00\u4e2a\u4ef7\u683c\u8bd5\u8bd5\u3002</div>';
+    rl.innerHTML = '<div class="record-empty">还没有记录，先给其中一个人记一笔，或者新增共享菜。</div>';
   } else {
-    var html = '';
-    for (var i = session.records.length - 1; i >= 0; i--) {
-      var r = session.records[i];
-      var tag, title, sub, amt;
-      if (r.kind === 'personal') {
-        tag = '\u5355\u4eba'; title = pName(r.participantId) + ' \u70b9\u4e86\u4e00\u4efd'; sub = '\u8bb0\u5230\u4e2a\u4eba\u540d\u4e0b'; amt = fmt(r.amount, true);
-      } else if (r.kind === 'shared') {
-        tag = '\u5171\u4eab'; title = r.participantIds.map(pName).join(' / ') + ' \u5e73\u644a';
-        sub = '\u6bcf\u4eba ' + fmt(r.amount / r.participantIds.length); amt = fmt(r.amount, true);
+    var html = "";
+    for (var rIndex = session.records.length - 1; rIndex >= 0; rIndex--) {
+      var r = session.records[rIndex];
+      var tag = "";
+      var tagClass = "";
+      var title = "";
+      var sub = "";
+      var amt = "";
+      var recordTagStyle = "";
+
+      if (r.kind === "personal") {
+        var personalTone = participantTone(r.participantId);
+        tag = "单人";
+        tagClass = "personal";
+        recordTagStyle = ' style="color:' + personalTone.solid + ';background:' + personalTone.soft + ';border-color:' + personalTone.line + '"';
+        title = '<span style="color:' + personalTone.solid + '">' + escapeHtml(pName(r.participantId)) + '</span> 记入一笔';
+        sub = "直接记到个人名下";
+        amt = fmt(r.amount, true);
+      } else if (r.kind === "shared") {
+        tag = "共享";
+        tagClass = "shared";
+        title = r.participantIds.map(function(id) { return escapeHtml(pName(id)); }).join(" / ") + " 平摊";
+        sub = "每人 " + fmt(r.amount / r.participantIds.length);
+        amt = fmt(r.amount, true);
       } else {
-        tag = '\u5b9e\u4ed8'; title = '\u65b0\u589e\u4e00\u7b14\u5b9e\u4ed8'; sub = '\u7528\u4e8e\u6700\u7ec8\u5b9e\u4ed8\u6821\u6b63'; amt = fmt(r.amount);
+        tag = "实付";
+        tagClass = "payment";
+        title = "新增一笔实付";
+        sub = "用于最终校正";
+        amt = fmt(r.amount);
       }
-      html += '<div class="record-item"><span class="record-tag">' + tag + '</span><div class="record-info"><div class="record-title">' + title + '</div><div class="record-sub">' + sub + '</div></div><div class="record-amount">' + amt + '</div></div>';
+
+      html +=
+        '<div class="record-item">' +
+          '<span class="record-tag ' + tagClass + '"' + recordTagStyle + '>' + tag + '</span>' +
+          '<div class="record-info">' +
+            '<div class="record-title">' + title + '</div>' +
+            '<div class="record-sub">' + sub + '</div>' +
+          '</div>' +
+          '<div class="record-amount">' + amt + '</div>' +
+        '</div>';
     }
     rl.innerHTML = html;
   }
 
-  $('undoBtn').disabled = session.records.length === 0;
-  $('clearBtn').disabled = session.records.length === 0;
+  $("undoBtn").disabled = session.records.length === 0;
+  $("clearBtn").disabled = session.records.length === 0;
 }
 
 function addPersonal(amount, pid) {
-  session.records.push({ id: uid(), kind: 'personal', amount: amount, participantId: pid, ts: Date.now() });
+  session.records.push({ id: uid(), kind: "personal", amount: amount, participantId: pid, ts: Date.now() });
   renderSession();
 }
 
-// DIY
 function openDIY(pid, name) {
   diyTargetId = pid;
-  $('diyTitle').textContent = '\u7ed9 ' + name + ' \u8bb0\u4e00\u7b14';
-  $('diyInput').value = '';
-  openModal('diyModal');
-  setTimeout(function() { $('diyInput').focus(); }, 350);
-}
-function confirmDIY() {
-  var v = parseFloat($('diyInput').value);
-  if (!v || v <= 0) return;
-  addPersonal(v, diyTargetId);
-  closeModal('diyModal');
+  $("diyTitle").textContent = "给 " + name + " 记一笔";
+  $("diyInput").value = "";
+  openModal("diyModal");
+  setTimeout(function() { $("diyInput").focus(); }, 260);
 }
 
-// Shared
+function confirmDIY() {
+  var v = parseFloat($("diyInput").value);
+  if (!v || v <= 0) return;
+  addPersonal(v, diyTargetId);
+  closeModal("diyModal");
+}
+
+function markSharedQuickSelection(selectedValue) {
+  $("sharedQuickRow").querySelectorAll('.quick-btn[data-samt]').forEach(function(btn) {
+    var active = parseFloat(btn.getAttribute('data-samt')) === selectedValue;
+    btn.classList.toggle('is-selected', active);
+  });
+}
+
 function openSharedModal() {
   sharedSelectedAmount = null;
   sharedSelectedIds = new Set();
-  $('sharedAmountInput').value = '';
-  var qr = $('sharedQuickRow');
-  var qhtml = '';
+  $("sharedAmountInput").value = "";
+
+  var qr = $("sharedQuickRow");
+  var qhtml = "";
   for (var i = 0; i < QUICK.length; i++) {
     qhtml += '<div class="quick-btn" data-samt="' + QUICK[i] + '">' + QUICK[i] + '</div>';
   }
-  qhtml += '<div></div>';
+  qhtml += '<div class="quick-btn" data-diy-placeholder="1">DIY</div>';
   qr.innerHTML = qhtml;
+
   qr.querySelectorAll('.quick-btn[data-samt]').forEach(function(btn) {
     btn.onclick = function() {
       sharedSelectedAmount = parseFloat(this.getAttribute('data-samt'));
-      $('sharedAmountInput').value = '';
-      qr.querySelectorAll('.quick-btn').forEach(function(b) { b.style.borderColor = ''; });
-      this.style.borderColor = 'var(--accent)';
+      $("sharedAmountInput").value = "";
+      markSharedQuickSelection(sharedSelectedAmount);
       updateSharedPreview();
     };
   });
 
-  // Select all button
-  $('sharedSelectAll').innerHTML = '<div class="select-all-row" id="selectAllBtn"><span class="label">\u5168\u9009\u6240\u6709\u4eba</span></div>';
-  $('selectAllBtn').onclick = function() {
+  var diyPlaceholder = qr.querySelector('.quick-btn[data-diy-placeholder]');
+  if (diyPlaceholder) diyPlaceholder.style.opacity = '.55';
+
+  $("sharedSelectAll").innerHTML = '<div class="select-all-row" id="selectAllBtn"><span>全选所有人</span><span>›</span></div>';
+  $("selectAllBtn").onclick = function() {
     var allSelected = sharedSelectedIds.size === session.participants.length;
     if (allSelected) {
       sharedSelectedIds = new Set();
@@ -577,13 +1125,14 @@ function openSharedModal() {
     updateSharedPreview();
   };
 
-  var sp = $('sharedParticipants');
-  var phtml = '';
-  for (var i = 0; i < session.participants.length; i++) {
-    var p = session.participants[i];
-    phtml += '<div class="participant-row" data-pid="' + p.id + '"><span class="name">' + p.name + '</span><span class="check-circle" id="sharedCheck_' + p.id + '"></span></div>';
+  var sp = $("sharedParticipants");
+  var phtml = "";
+  for (var j = 0; j < session.participants.length; j++) {
+    var p = session.participants[j];
+    phtml += '<div class="participant-row" data-pid="' + p.id + '"><span class="name">' + escapeHtml(p.name) + '</span><span class="check-circle" id="sharedCheck_' + p.id + '"></span></div>';
   }
   sp.innerHTML = phtml;
+
   sp.querySelectorAll('.participant-row').forEach(function(row) {
     row.onclick = function() {
       var pid = this.getAttribute('data-pid');
@@ -592,137 +1141,150 @@ function openSharedModal() {
       updateSharedPreview();
     };
   });
+
+  refreshSharedChecks();
   updateSharedPreview();
-  openModal('sharedModal');
+  openModal("sharedModal");
 }
 
 function refreshSharedChecks() {
   for (var i = 0; i < session.participants.length; i++) {
     var p = session.participants[i];
-    var el = $('sharedCheck_' + p.id);
+    var el = $("sharedCheck_" + p.id);
     if (el) {
       var sel = sharedSelectedIds.has(p.id);
-      el.className = 'check-circle' + (sel ? ' checked' : '');
-      el.textContent = sel ? '\u2713' : '';
+      el.className = "check-circle" + (sel ? " checked" : "");
+      el.textContent = sel ? "✓" : "";
     }
   }
-  // Update select all label
+
   var allSelected = sharedSelectedIds.size === session.participants.length;
-  var btn = $('selectAllBtn');
+  var btn = $("selectAllBtn");
   if (btn) {
-    btn.querySelector('.label').textContent = allSelected ? '\u53d6\u6d88\u5168\u9009' : '\u5168\u9009\u6240\u6709\u4eba';
+    btn.querySelector('span').textContent = allSelected ? "取消全选" : "全选所有人";
   }
 }
 
 function getSharedAmount() {
-  var custom = parseFloat($('sharedAmountInput').value);
-  return (custom > 0) ? custom : sharedSelectedAmount;
+  var custom = parseFloat($("sharedAmountInput").value);
+  return custom > 0 ? custom : sharedSelectedAmount;
 }
+
 function updateSharedPreview() {
   var a = getSharedAmount();
   var n = sharedSelectedIds.size;
-  var pre = $('sharedPreview');
+  var pre = $("sharedPreview");
   if (a && n >= 2) {
-    pre.textContent = '\u603b\u989d ' + fmt(a) + ' \u00b7 ' + n + ' \u4eba \u00b7 \u6bcf\u4eba ' + fmt(a / n);
+    pre.textContent = "总额 " + fmt(a) + " · " + n + " 人 · 每人 " + fmt(a / n);
+  } else if (n < 2) {
+    pre.textContent = "请至少选 2 个人。";
   } else {
-    pre.textContent = n < 2 ? '\u8bf7\u9009\u62e9\u81f3\u5c11 2 \u4eba' : '\u8bf7\u8f93\u5165\u91d1\u989d';
+    pre.textContent = "请输入金额。";
   }
-  $('sharedConfirmBtn').disabled = !(a > 0 && n >= 2);
+  $("sharedConfirmBtn").disabled = !(a > 0 && n >= 2);
 }
-$('sharedAmountInput').addEventListener('input', function() {
+
+$("sharedAmountInput").addEventListener("input", function() {
   sharedSelectedAmount = null;
-  $('sharedQuickRow').querySelectorAll('.quick-btn').forEach(function(b) { b.style.borderColor = ''; });
+  markSharedQuickSelection(NaN);
   updateSharedPreview();
 });
+
 function confirmShared() {
   var a = getSharedAmount();
   if (!a || sharedSelectedIds.size < 2) return;
-  session.records.push({ id: uid(), kind: 'shared', amount: a, participantIds: Array.from(sharedSelectedIds), ts: Date.now() });
-  closeModal('sharedModal');
+  session.records.push({ id: uid(), kind: "shared", amount: a, participantIds: Array.from(sharedSelectedIds), ts: Date.now() });
+  closeModal("sharedModal");
   renderSession();
 }
 
-// Payment
 function openPaymentModal() {
-  $('paymentInput').value = '';
+  $("paymentInput").value = "";
   renderPaymentModal();
-  openModal('paymentModal');
+  openModal("paymentModal");
 }
+
 function renderPaymentModal() {
-  var pays = session.records.filter(function(r) { return r.kind === 'payment'; });
+  var pays = session.records.filter(function(r) { return r.kind === "payment"; });
   if (pays.length) {
-    var h = '';
+    var h = "";
     for (var i = 0; i < pays.length; i++) {
-      h += '<div class="row" style="margin-bottom:6px"><span>\u5b9e\u4ed8 ' + (i + 1) + '</span><span class="grow"></span><span class="bold mono">' + fmt(pays[i].amount) + '</span></div>';
+      h += '<div class="result-line"><span class="k">实付 ' + (i + 1) + '</span><span class="v">' + fmt(pays[i].amount) + '</span></div>';
     }
-    $('paymentList').innerHTML = h;
+    $("paymentList").innerHTML = h;
   } else {
-    $('paymentList').textContent = '\u8fd8\u6ca1\u6709\u5b9e\u4ed8\u8bb0\u5f55';
+    $("paymentList").textContent = "还没有实付记录。";
   }
-  $('payOriginal').textContent = fmt(originalTotal());
+
+  $("payOriginal").textContent = fmt(originalTotal());
   var pt = paymentTotal();
-  $('payTotal').textContent = pt !== null ? fmt(pt) : '\u672a\u5f55\u5165';
+  $("payTotal").textContent = pt !== null ? fmt(pt) : "未录入";
   var diff = difference();
-  $('payDiff').textContent = diff !== null ? fmt(diff, true) : '\u5f85\u8ba1\u7b97';
+  $("payDiff").textContent = diff !== null ? fmt(diff, true) : "待计算";
 }
+
 function addPayment() {
-  var v = parseFloat($('paymentInput').value);
+  var v = parseFloat($("paymentInput").value);
   if (!v || v <= 0) return;
-  session.records.push({ id: uid(), kind: 'payment', amount: v, ts: Date.now() });
-  $('paymentInput').value = '';
+  session.records.push({ id: uid(), kind: "payment", amount: v, ts: Date.now() });
+  $("paymentInput").value = "";
   renderPaymentModal();
   renderSession();
 }
 
-// Result
 function openResultModal() {
-  var html = '<div class="section-title">\u6bcf\u4e2a\u4eba\u6700\u7ec8\u5e94\u4ed8</div>';
+  var html = '<div class="result-stack">';
   for (var i = 0; i < session.participants.length; i++) {
     var p = session.participants[i];
     var oa = originalAmount(p.id);
     var adj = adjustment(p.id);
     var fa = finalAmount(p.id);
-    html += '<div class="card"><div style="font-size:16px;font-weight:600;margin-bottom:10px">' + p.name + '</div>' +
-      '<div class="row" style="margin-bottom:4px"><span class="text-secondary">\u539f\u59cb</span><span class="grow"></span><span class="mono">' + fmt(oa) + '</span></div>' +
-      '<div class="row" style="margin-bottom:4px"><span class="text-secondary">\u6821\u6b63</span><span class="grow"></span><span class="mono">' + fmt(adj, true) + '</span></div>' +
-      '<div class="row"><span class="bold">\u6700\u7ec8\u5e94\u4ed8</span><span class="grow"></span><span class="bold mono" style="font-size:17px">' + fmt(fa) + '</span></div></div>';
+    html +=
+      '<div class="glass-card result-card">' +
+        '<div class="result-name">' + escapeHtml(p.name) + '</div>' +
+        '<div class="result-line"><span class="k">原始</span><span class="v">' + fmt(oa) + '</span></div>' +
+        '<div class="result-line"><span class="k">校正</span><span class="v">' + fmt(adj, true) + '</span></div>' +
+        '<div class="result-line emphasis"><span class="k">最终应付</span><span class="v">' + fmt(fa) + '</span></div>' +
+      '</div>';
   }
-  html += '<div class="section-title" style="margin-top:20px">\u6574\u684c\u6c47\u603b</div><div class="card">';
-  html += '<div class="row" style="margin-bottom:6px"><span class="text-secondary">\u539f\u59cb\u603b\u989d</span><span class="grow"></span><span class="mono">' + fmt(originalTotal()) + '</span></div>';
+
   var pt = paymentTotal();
-  html += '<div class="row" style="margin-bottom:6px"><span class="text-secondary">\u6700\u7ec8\u5b9e\u4ed8</span><span class="grow"></span><span class="mono">' + (pt !== null ? fmt(pt) : '\u672a\u5f55\u5165') + '</span></div>';
   var diff = difference();
-  html += '<div class="row"><span class="text-secondary">\u5dee\u989d</span><span class="grow"></span><span class="mono">' + (diff !== null ? fmt(diff, true) : '\u00a50') + '</span></div>';
-  html += '</div>';
-  $('resultContent').innerHTML = html;
-  openModal('resultModal');
+  html +=
+    '<div class="glass-card result-card">' +
+      '<div class="result-name">整桌汇总</div>' +
+      '<div class="result-line"><span class="k">原始总额</span><span class="v">' + fmt(originalTotal()) + '</span></div>' +
+      '<div class="result-line"><span class="k">最终实付</span><span class="v">' + (pt !== null ? fmt(pt) : '未录入') + '</span></div>' +
+      '<div class="result-line emphasis"><span class="k">差额</span><span class="v">' + (diff !== null ? fmt(diff, true) : '¥0') + '</span></div>' +
+    '</div>' +
+  '</div>';
+
+  $("resultContent").innerHTML = html;
+  openModal("resultModal");
 }
 
-// Undo & Clear & Restart
 function undoLast() {
-  if (session && session.records.length) { session.records.pop(); renderSession(); }
+  if (session && session.records.length) {
+    session.records.pop();
+    renderSession();
+  }
 }
+
 function askClear() {
-  showConfirm('\u786e\u8ba4\u6e05\u7a7a\u5f53\u524d\u996d\u5c40\u6240\u6709\u8bb0\u5f55\uff1f', function() {
+  showConfirm("确认清空当前饭局所有记录？", function() {
     session.records = [];
     renderSession();
   });
 }
+
 function askRestart() {
-  if (!session || session.records.length === 0) {
+  showConfirm("确认重置全部信息？当前人数、记录和实付都会清空。", function() {
     session = null;
-    showPage('startPage');
-    renderStart();
-    return;
-  }
-  showConfirm('\u8fd4\u56de\u5c06\u4e22\u5931\u5f53\u524d\u996d\u5c40\u8bb0\u5f55\uff0c\u786e\u5b9a\uff1f', function() {
-    session = null;
-    showPage('startPage');
+    showPage("startPage");
     renderStart();
   });
 }
 
-// Init
 renderStart();
 </script>
 </body>
